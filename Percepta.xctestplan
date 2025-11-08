@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "0285FCFB-F610-4306-BC33-39BA1FC5DC3B",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Percepta.xcodeproj",
+      "identifier" : "8BCC55642EBEEF3800F548C7",
+      "name" : "Percepta"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Percepta.xcodeproj",
+        "identifier" : "8BCC55732EBEEF3B00F548C7",
+        "name" : "PerceptaTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Percepta.xcodeproj",
+        "identifier" : "8BCC557D2EBEEF3B00F548C7",
+        "name" : "PerceptaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

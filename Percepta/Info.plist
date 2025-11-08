@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   Property List.plist
-   Percepta
-
-   Created by Anh Tuấn Trần on 11/8/25.
-   Copyright (c) 2025 ___ORGANIZATIONNAME___. All rights reserved.
--->
 <plist version="1.0">
-<dict/>
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>We need camera access to capture and analyze objects.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access for AR and video features.</string>
+</dict>
 </plist>
