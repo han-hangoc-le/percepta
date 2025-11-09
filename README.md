@@ -1,6 +1,6 @@
 # Percepta
 
-![Percepta](https://github.com/han-hangoc-le/percepta/blob/feat/hanle-thunguyen-swiftui/Percepta_thumbnail.png)
+![Percepta](https://github.com/han-hangoc-le/percepta/blob/feat/hanle-thunguyen-swiftui/Percepta_long.png)
 
 Developed during HackPrinceton Fall'25, **Percepta** is an iOS camera application that transforms your view of the world through different knowledge-based "lenses" - seeing everyday scenes through the eyes of a mathematician, physicist, biologist, or artist.
 
