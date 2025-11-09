@@ -7,6 +7,21 @@ struct DetectionResponsePayload: Codable {
     var message: String?
 }
 
+struct ObjectUploadPayload: Codable {
+    var clientObjectId: String
+    var lensMode: String
+    var label: String
+    var confidence: Float
+    var boundingBox: BoundingBox
+    var imageBase64: String
+}
+
+struct ObjectProcessingResponse: Codable {
+    var clientObjectId: String
+    var annotatedImageBase64: String
+    var message: String?
+}
+
 struct DetectionResult {
     var objects: [DetectedObject]
     var lensMode: String
@@ -58,7 +73,7 @@ final class APIService {
     private let defaultTimeout: TimeInterval = 10
     private let maxRetries = 1
 
-    private var overrideBaseUrl: String?
+    private var overrideBaseUrl: String? = "http://10.25.19.251:5050"
 
     private func buildUrl(from host: String) -> String {
         return "http://\(host):\(defaultPort)\(defaultPath)"
@@ -67,13 +82,21 @@ final class APIService {
     private func baseCandidates() -> [String] {
         var candidates: Set<String> = []
         if let overrideBaseUrl {
-            candidates.insert(overrideBaseUrl)
+            candidates.insert(ensureApiPath(for: overrideBaseUrl))
         }
         candidates.insert(buildUrl(from: "127.0.0.1"))
         candidates.insert(buildUrl(from: "localhost"))
         candidates.insert(buildUrl(from: "10.0.2.2")) // Android emulator style
 
         return Array(candidates)
+    }
+
+    private func ensureApiPath(for base: String) -> String {
+        let trimmed = base.hasSuffix("/") ? String(base.dropLast()) : base
+        if trimmed.lowercased().contains("\(defaultPath)/") || trimmed.lowercased().hasSuffix(defaultPath) {
+            return trimmed
+        }
+        return "\(trimmed)\(defaultPath)"
     }
 
     private func request<T: Decodable>(_ endpoint: String,
@@ -96,6 +119,9 @@ final class APIService {
 
             for attempt in 0...retries {
                 do {
+#if DEBUG
+                    print("[API] \(method) \(url.absoluteString) attempt \(attempt + 1)")
+#endif
                     let (data, response) = try await URLSession.shared.data(for: request)
                     guard let httpResponse = response as? HTTPURLResponse else {
                         throw ApiError(info: ApiErrorInfo(type: "invalid-response",
@@ -104,12 +130,19 @@ final class APIService {
 
                     if (200..<300).contains(httpResponse.statusCode) {
                         return try JSONDecoder().decode(T.self, from: data)
-                    } else {
-                        throw ApiError(info: ApiErrorInfo(type: "server",
-                                                          message: "Server returned \(httpResponse.statusCode)",
-                                                          status: httpResponse.statusCode))
                     }
+
+                    let errorMessage = APIService.extractServerMessage(from: data)
+                    let type = (400..<500).contains(httpResponse.statusCode) ? "client" : "server"
+                    throw ApiError(info: ApiErrorInfo(type: type,
+                                                      message: errorMessage.isEmpty
+                                                        ? "Server returned \(httpResponse.statusCode)"
+                                                        : errorMessage,
+                                                      status: httpResponse.statusCode))
                 } catch {
+#if DEBUG
+                    print("[API] \(method) \(url.absoluteString) failed: \(error.localizedDescription)")
+#endif
                     lastError = error
                     if attempt < retries { continue }
                 }
@@ -165,6 +198,32 @@ final class APIService {
         }
     }
 
+    func processObject(payload: ObjectUploadPayload) async throws -> ObjectProcessingResponse {
+        do {
+            return try await request(
+                "/objects",
+                method: "POST",
+                body: [
+                    "clientObjectId": payload.clientObjectId,
+                    "lensMode": payload.lensMode,
+                    "label": payload.label,
+                    "confidence": payload.confidence,
+                    "boundingBox": [
+                        "x": payload.boundingBox.x,
+                        "y": payload.boundingBox.y,
+                        "width": payload.boundingBox.width,
+                        "height": payload.boundingBox.height
+                    ],
+                    "imageBase64": payload.imageBase64
+                ],
+                retries: maxRetries,
+                responseType: ObjectProcessingResponse.self
+            )
+        } catch {
+            throw toApiError(error)
+        }
+    }
+
     func checkHealth() async throws -> HealthResponse {
         do {
             return try await request("/health", method: "GET", retries: 0, responseType: HealthResponse.self)
@@ -213,6 +272,21 @@ final class APIService {
                                            originalError: error))
     }
 
+    private static func extractServerMessage(from data: Data) -> String {
+        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            if let details = json["details"] as? String, !details.isEmpty {
+                return details
+            }
+            if let error = json["error"] as? String, !error.isEmpty {
+                return error
+            }
+            if let message = json["message"] as? String, !message.isEmpty {
+                return message
+            }
+        }
+        return String(data: data, encoding: .utf8) ?? ""
+    }
+
     func mapErrorToMessage(_ error: Error) -> String {
         let info: ApiErrorInfo
         if let apiError = error as? ApiError {
@@ -223,17 +297,38 @@ final class APIService {
 
         switch info.type {
         case "network":
-            return "Can't connect to server. Check your connection and try again."
+            let detail = info.message.isEmpty ? "" : " (\(info.message))"
+            return "Can't connect to server\(detail)."
         case "timeout":
-            return "Request took too long. Please try again."
+            let detail = info.message.isEmpty ? "" : " (\(info.message))"
+            return "Request took too long\(detail). Please try again."
         case "server":
-            return "Server is having issues. Please try again later."
+            return info.message.isEmpty ? "Server is having issues. Please try again later." : info.message
         case "invalid-response":
-            return "Received an unexpected response from the server."
+            return info.message.isEmpty ? "Received an unexpected response from the server." : info.message
         case "client":
             return info.message
         default:
             return info.message.isEmpty ? "Something went wrong. Please try again." : info.message
         }
+    }
+
+    func debugDescription(for error: Error) -> String {
+        if let apiError = error as? ApiError {
+            let info = apiError.info
+            var parts: [String] = []
+            parts.append("[\(info.type)]")
+            if let status = info.status {
+                parts.append("status \(status)")
+            }
+            if let code = info.code {
+                parts.append("code \(code)")
+            }
+            if !info.message.isEmpty {
+                parts.append(info.message)
+            }
+            return parts.joined(separator: " ")
+        }
+        return error.localizedDescription
     }
 }
