@@ -41,11 +41,23 @@ ARTIST_PROMPT = (
     "inspire creative overlays. Emphasize style and storytelling over scientific diagrams."
 )
 
+ECO_PROMPT = (
+    "You are an eco lens assistant. Highlight an object's carbon impact, energy usage, or sustainability "
+    "facts using concrete metrics. Keep explanations grounded in lifecycle thinking."
+)
+
+CULTURAL_PROMPT = (
+    "You are a cultural lens assistant. Reveal the linguistic, regional, or historical origins of objects, "
+    "including notable traditions or etymology."
+)
+
 LENS_PROMPTS = {
     "mathematician": MATHEMATICIAN_PROMPT,
     "physicist": PHYSICIST_PROMPT,
     "biologist": BIOLOGIST_PROMPT,
     "artist": ARTIST_PROMPT,
+    "eco": ECO_PROMPT,
+    "cultural": CULTURAL_PROMPT,
     "math": MATHEMATICIAN_PROMPT,
     "physics": PHYSICIST_PROMPT,
 }
@@ -59,6 +71,11 @@ LENS_ALIASES = {
     "bio": "biologist",
     "biologist": "biologist",
     "artist": "artist",
+    "eco": "eco",
+    "sustainability": "eco",
+    "environmental": "eco",
+    "cultural": "cultural",
+    "culture": "cultural",
 }
 
 # -------------------- PHASE 1 PROMPT TEMPLATE --------------------
@@ -124,58 +141,77 @@ Example output:
 """
 
 PHASE1_PROMPT_BIOLOGY = """
-You are generating structured data for a biology lens AI that overlays educational diagrams on real imagery.
+You are generating structured data for a biology lens AI that overlays educational facts on real imagery.
 
 Given the following information:
 Object: {object}
 Image (optional): {image_url}
 
-Return a JSON object with exactly four keys:
+Return a JSON object with exactly three keys:
 1. "object" – the object's name.
-2. "equation" – the core biological relationship or rate to highlight.
-3. "explanation" – a short description of what the process means and why it matters for this object.
-4. "guide" – detailed instructions for visualizing anatomical layers, flows, or labels in a translucent overlay.
+2. "equation" – the core biological relationship, proportionality, or rate to highlight.
+3. "explanation" – a concise description (2–4 sentences) that interprets the equation in the context of this object
+   and mentions low-level anatomical or ecological cues (e.g., tissue types, diffusion, stomata behavior).
 
-In "guide", include bullet points that specify:
-- Biological focus: name the exact tissue, organelle, or ecological interaction being highlighted, plus which direction
-  the viewer is looking from (cross-section, macro close-up, etc.).
-- Layer breakdown: describe each translucent layer (outer skin, vascular bundle, cell interior), its color/opacity, and
-  how to offset or clip it to fit the real object silhouette.
-- Flow/pathway rendering: detail the path of fluids, nutrients, or signals with arrow styles, particle counts, and
-  animation hints (e.g., pulsing cyan droplets, gradient arrows fading along the direction of flow).
-- Labeling scheme: list every label with coordinates, connector-line style, and icon badges (e.g., mitochondria icon,
-  leaf stomata marker). Include guidance for variable legends or mini info cards.
-- Environmental context: if relevant, mention background cues such as humidity halos, soil cross-sections, or light
-  direction indicators that help explain the biological process.
+Do NOT include any other keys. Keep the tone instructive and grounded in observable biological features.
 
 Example output:
 {example}
 """
 
 PHASE1_PROMPT_ART = """
-You are generating structured data for an artist lens AI that overlays creative guidance on a live camera feed.
+You are generating structured data for an artist lens AI that overlays creative commentary on a live camera feed.
 
 Given the following information:
 Object: {object}
 Image (optional): {image_url}
 
-Return a JSON object with exactly four keys:
+Return a JSON object with exactly three keys:
 1. "object" – the object's name.
-2. "equation" – describe the aesthetic recipe (palette, composition ratio, rhythm).
-3. "explanation" – briefly explain how the artistic principle applies to this object.
-4. "guide" – detailed prompts covering brush style, lighting hints, or typography placement.
+2. "equation" – describe the aesthetic recipe, palette shorthand, rhythm, or lighting ratio in a compact formula-like
+   phrase (e.g., "Palette = (#hex, #hex) · Rhythm = repeating crescents").
+3. "explanation" – a concise note (2–4 sentences) describing how that artistic principle applies to the observed object,
+   referencing low-level cues such as brush direction, color temperature shifts, or composition lines.
 
-In "guide", include structured bullet points for:
-- Palette strategy: list at least three hex values with roles (base fill, highlights, accent strokes) plus blending
-  instructions (e.g., soft gradient, stippled texture).
-- Composition geometry: specify the exact overlay guides (rule-of-thirds grid, golden spiral, leading lines) and how
-  they align with the object. Mention line weights, glow, and opacity.
-- Brushwork & texture: describe the stroke type (ink line, oil smear, watercolor wash), spacing, motion direction, and
-  whether strokes should trail off or loop around the object.
-- Typography & annotations: note any captions, font styles, or iconography, including placement relative to the object
-  and whether they should animate or fade in.
-- Lighting cues: indicate rim-light colors, shadow exaggerations, or particle effects that help the scene feel painted
-  while preserving the underlying camera feed.
+Do NOT include any other keys. Keep wording vivid but focused on actionable visual insights.
+
+Example output:
+{example}
+"""
+
+PHASE1_PROMPT_ECO = """
+You are generating structured data for an eco lens AI that overlays sustainability facts on top of real imagery.
+
+Given the following information:
+Object: {object}
+Image (optional): {image_url}
+
+Return a JSON object with exactly three keys:
+1. "object" – the object's name.
+2. "equation" – express a low-level sustainability relationship or carbon metric (e.g., "Annual CO₂ savings = baseline - efficient usage").
+3. "explanation" – 2–4 sentences that quantify the impact, reference typical usage assumptions, and mention at least one concrete stat
+   such as grams of CO₂, liters of water, recycled content percentage, or payback period.
+
+Do NOT include any other keys. Treat the "equation" as a compact formula or data expression, not a sentence.
+
+Example output:
+{example}
+"""
+
+PHASE1_PROMPT_CULTURAL = """
+You are generating structured data for a cultural lens AI that reveals linguistic or historical origins of objects.
+
+Given the following information:
+Object: {object}
+Image (optional): {image_url}
+
+Return a JSON object with exactly three keys:
+1. "object" – the object's name.
+2. "equation" – summarize the cultural data as a compact expression (e.g., "Origin = Edo Japan · Meaning = 'writing brush'").
+3. "explanation" – 2–4 sentences describing the item's cultural roots, etymology, or traditional usage, referencing at least one region,
+   community, or language detail.
+
+Do NOT include any other keys. Keep tone respectful and factual.
 
 Example output:
 {example}
@@ -190,7 +226,7 @@ MATHEMATICIAN_EXAMPLE = """{
 
 {
   "object": "spiral notebook",
-  "equation": "Area = w × h",
+  "equation": "Area = w x h",
   "explanation": "Surface area of the notebook cover treated as a rectangle.",
   "guide": "Step 1: Flatten the notebook cover into an orthographic rectangle with a subtle grid overlay. Step 2: Use a bold horizontal arrow to mark width w along the lower edge and a vertical arrow for height h on the right edge; both arrows get labeled tabs with tiny scale ticks. Step 3: Shade the rectangle with unit squares to imply multiplication of w and h. Step 4: Draw a floating equation card at the corner containing Area = w × h plus short reminders 'w = horizontal span' and 'h = vertical span'. Step 5: Add faint leader lines from the card back to the measurement arrows to reinforce the relationship."
 }
@@ -324,141 +360,169 @@ PHYSICIST_EXAMPLE = """{
 BIOLOGIST_EXAMPLE = """{
   "object": "leaf",
   "equation": "Transpiration rate = Stomatal conductance × Vapor pressure deficit",
-  "explanation": "Water exits the leaf via stomata; the rate depends on how open they are and the humidity difference.",
-  "guide": "Step 1: Overlay a semi-transparent cross-section of the leaf showing epidermis, mesophyll, and vein network. Step 2: Highlight stomata along the underside with pulsing cyan markers and label conductance near each pore. Step 3: Draw upward arrows representing vapor flux; color them according to magnitude to visualize vapor pressure deficit. Step 4: Add a side legend tying arrow color thickness to stomatal conductance values. Step 5: Place the equation in a floating panel with bullet notes describing how each variable maps to the highlighted structures."
+  "explanation": "Water escapes through stomata on the underside of the blade. The flux scales with both how wide the pores open and how dry the surrounding air is."
 }
 
 {
   "object": "tree trunk",
-  "equation": "Flow = πr²v",
-  "explanation": "Sap flux approximated by cross-sectional area times velocity.",
-  "guide": "Step 1: Cut the trunk horizontally and expose concentric rings; color-code xylem versus phloem. Step 2: Mark radius r from center to active xylem ring with an arrow. Step 3: Shade the cross-sectional area πr² to show the conducting region. Step 4: Animate sap droplets moving upward in a side view, labeling velocity v along the conduit paths. Step 5: Present Flow = πr²v near the slice with notes linking πr² to the shaded area and v to the droplet velocity arrows."
+  "equation": "Sap flow = πr² × upward_velocity",
+  "explanation": "The conducting xylem ring provides cross-sectional area πr², so thicker trunks move more sap when upward velocity from transpiration pull stays the same."
 }
 
 {
   "object": "flower stamen",
   "equation": "Pollen release rate = aperture_area × wind_speed",
-  "explanation": "Simple mass flow relation for low-wind dispersal.",
-  "guide": "Step 1: Zoom into the stamen tip and render the anther opening with a glowing outline. Step 2: Highlight the aperture area with a semi-transparent disk and annotate its diameter. Step 3: Show pollen grains leaving the aperture as small luminous particles, each with motion trails. Step 4: Draw wind vectors sweeping past the anther, labeling their speed. Step 5: Place the rate equation in a HUD box with callouts linking aperture area to the highlighted disk and wind speed to the vector arrows."
+  "explanation": "Broader anther openings expose more pollen grains to airflow. Even gentle breezes loft grains efficiently when the aperture area is large."
 }
 
 {
-  "object": "mushroom cap",
-  "equation": "Spore count = density × gill_area",
-  "explanation": "Estimate of spores produced per gill surface.",
-  "guide": "Step 1: Show the underside of the mushroom with gills rendered as alternately shaded ridges. Step 2: Overlay measurement rectangles along representative gill segments to denote sampled area. Step 3: Display spore density numbers above the rectangles and connect them to a scale bar. Step 4: Annotate total gill area with contour lines wrapping the entire cap underside. Step 5: Present the equation with arrows tying 'density' to the sample rectangles and 'gill_area' to the full contour."
+  "object": "mushroom gill",
+  "equation": "Spore count = gill_area × spore_density",
+  "explanation": "Sample a gill, count spores per square millimeter, then multiply by total gill area to estimate nightly spore rain."
 }
 
 {
   "object": "coral branch",
-  "equation": "Photosynthesis rate ∝ light_intensity × chlorophyll_fraction",
-  "explanation": "Shallow coral productivity depends on light capture.",
-  "guide": "Step 1: Render a coral branch with polyps outlined; tint chlorophyll-rich tissues with a neon overlay and label 'chlorophyll fraction'. Step 2: Draw downward light beams entering the water, annotating their intensity with numeric values or gradient bars. Step 3: Add oxygen bubbles emanating from polyps to imply photosynthetic output. Step 4: Include a HUD showing a multiplier between light intensity and chlorophyll fraction. Step 5: Connect the HUD back to the beams and chlorophyll overlay using leader lines."
+  "equation": "Photosynthesis ∝ light_intensity × chlorophyll_fraction",
+  "explanation": "Polyps packed with algae convert light into sugar efficiently. Bleached tissue with low chlorophyll yields far less energy."
 }
 
 {
   "object": "bee wing",
   "equation": "Wingbeat frequency = airflow_velocity / stroke_amplitude",
-  "explanation": "Approximate relation tying motion to airflow.",
-  "guide": "Step 1: Illustrate the wing as layered translucent membranes with keyed nodes for muscle attachment. Step 2: Draw sweeping arcs that show stroke amplitude, labeling the extremes. Step 3: Overlay airflow streamlines moving past the wing, color-coded for velocity. Step 4: Place a frequency indicator (beats/sec) near the thorax and connect it to the arcs. Step 5: Show the equation panel explaining how airflow velocity feeds into the numerator and stroke amplitude into the denominator."
+  "explanation": "Smaller stroke arcs demand higher beat frequency to maintain lift for the same airflow velocity when hovering near flowers."
 }
 
 {
   "object": "human hand",
   "equation": "Blood flow = ΔP / vascular_resistance",
-  "explanation": "Ohm's law analogy for circulation.",
-  "guide": "Step 1: Overlay a vascular map on the hand, using red for arteries and blue for veins. Step 2: Indicate pressure drop ΔP between wrist and fingertips using gauge icons. Step 3: Draw directional arrows along the vessels to show flow direction and thickness proportional to rate. Step 4: Annotate vascular resistance near constriction points or capillary beds. Step 5: Place the equation in a HUD, connecting ΔP to the pressure gauges and resistance to highlighted vessel segments."
+  "explanation": "A pressure drop from wrist to fingertips pushes blood through capillaries. Cold-induced vasoconstriction raises resistance, lowering flow even if ΔP stays constant."
 }
 
 {
   "object": "butterfly wing",
   "equation": "Scale overlap ratio = scale_width / scale_pitch",
-  "explanation": "Geometric relation determining color shimmer.",
-  "guide": "Step 1: Zoom into the wing surface and depict parallel rows of scales with translucent overlays. Step 2: Use micrometer-style arrows to measure individual scale width and the spacing (pitch) between successive scales. Step 3: Draw a ratio bar representing width/pitch and color-code it. Step 4: Add shimmer arrows showing how overlap affects interference patterns. Step 5: Show the equation panel with miniature diagrams illustrating numerator (width) and denominator (pitch)."
+  "explanation": "Large width relative to pitch packs more scales into each row, stacking reflective plates that intensify iridescent shimmer."
 }
 
 {
   "object": "snail shell",
-  "equation": "Growth = initial_radius × e^{kθ}",
-  "explanation": "Logarithmic spiral describing shell expansion.",
-  "guide": "Step 1: Outline the shell spiral and overlay contour lines for successive growth phases. Step 2: Draw an angle θ measured at the spiral center and annotate it with an arc arrow. Step 3: Show the initial radius and current radius using radial arrows from the center. Step 4: Place a mini graph illustrating exponential growth with parameter k, referencing mantle tissue responsible for secretion. Step 5: Display the equation with arrows pointing to the radius measurement and the angle arc."
+  "equation": "Radius = initial_radius × e^{kθ}",
+  "explanation": "The shell follows a logarithmic spiral: every increment in angle θ expands radius exponentially with growth constant k, mirroring mantle secretion."
 }
 
 {
   "object": "seedling root",
-  "equation": "Osmotic influx = k (Ψ_soil - Ψ_root)",
-  "explanation": "Water uptake driven by water potential difference.",
-  "guide": "Step 1: Cross-section the soil and root zone, shading soil layers with moisture gradients. Step 2: Highlight root hairs with glowing tips and show water droplets moving inward. Step 3: Place Ψ_soil and Ψ_root gauges on either side of the membrane and connect them with a ΔΨ bar. Step 4: Draw arrows whose thickness reflects osmotic influx, labeled with constant k. Step 5: Present the equation in a HUD linking each term to the gauges and arrows, explaining the direction of water movement."
+  "equation": "Osmotic influx = k × (Ψ_soil - Ψ_root)",
+  "explanation": "Water flows into root hairs when soil water potential exceeds the root interior. Dry soil narrows the potential gap and slows the inflow."
 }"""
 
 ARTIST_EXAMPLE = """{
   "object": "coffee cup",
   "equation": "Palette = (#f5e9db, #c28455, #2f1b0c) · Composition = 2:1 negative space ratio",
   "explanation": "Warm ceramics pop against a cool tabletop when you give the frame breathing room.",
-  "guide": "Step 1: Trace cup and saucer contours with double strokes (inner #f5e9db, outer #2f1b0c) to define the silhouette. Step 2: Overlay a golden spiral guide from saucer edge to rim highlight, labeling start/end nodes and intersection with the focal highlight. Step 3: Place palette swatches near the handle with arrows indicating where each tone appears (base fill, mid-tone, accent). Step 4: Paint a teal rim-light strip opposite the key light and annotate it as 'cool complement'. Step 5: Draw bounding boxes showing the 2:1 negative space ratio and include a caption explaining how empty tabletop reinforces the equation."
 }
 
 {
   "object": "street lamp",
   "equation": "Palette = (#0f172a, #fbbf24, #ecfccb)",
   "explanation": "Midnight blues contrasting with sodium glow and soft foliage accents.",
-  "guide": "Step 1: Lay down a vertical gradient background from #0f172a to #1e293b. Step 2: Outline the lamp post using ink-like strokes, thickening the base for weight. Step 3: Project a cone of light in #fbbf24 with stippled particles falling through it; annotate intensity falloff. Step 4: Paint nearby foliage silhouettes in #ecfccb to indicate reflected glow. Step 5: Add two vertical leading lines guiding the eye upward and place palette chips with arrows pointing to their use regions."
 }
 
 {
   "object": "window plant",
   "equation": "Composition = diagonal flow",
   "explanation": "Leaves guide the viewer from lower-left to upper-right.",
-  "guide": "Step 1: Sketch translucent leaves and indicate overlapping fronds. Step 2: Overlay two diagonal bands running from the pot to the window corner, labeling them 'flow guide A' and 'flow guide B'. Step 3: Attach small color swatches near key leaves showing shifts from cool shadow greens to sunlit yellow-greens. Step 4: Annotate brushwork instructions (dry-brush edges, wet glaze near glare). Step 5: Add arrowheads along the diagonal bands and a caption describing how the flow leads the eye through the composition."
 }
 
 {
   "object": "bowl of fruit",
   "equation": "Palette = (#f97316, #facc15, #fef9c3) · Rhythm = repeating crescents",
   "explanation": "Warm triadic palette with echoing curved shapes.",
-  "guide": "Step 1: Outline each fruit and accentuate their curvature with contour lines. Step 2: Overlay concentric crescent guides across the bowl, labeling them to show repeated rhythms. Step 3: Assign each palette color to specific fruit zones using swatches with leader lines. Step 4: Mark highlight regions with 'glaze' annotations and shadow zones with 'scumble' notes to imply texture. Step 5: Include a mini legend summarizing how the palette rotates through the arrangement and how crescents echo across the forms."
 }
 
 {
   "object": "bicycle",
   "equation": "Rule-of-thirds anchors = saddle & front hub",
   "explanation": "Place critical features on grid intersections.",
-  "guide": "Step 1: Overlay a rule-of-thirds grid across the camera frame. Step 2: Pin the saddle and front hub to the nearest grid intersections using glowing crosshair icons. Step 3: Trace frame tubes in complementary accent colors and annotate where to apply each tone. Step 4: Add motion direction arrows along wheels and brushstroke cues for spokes. Step 5: Include a caption explaining how anchoring saddle/hub stabilizes the design and show mini diagrams of alternative placements."
 }
 
 {
   "object": "book stack",
   "equation": "Contrast = cool shadows vs warm covers",
   "explanation": "Push chroma difference to create depth.",
-  "guide": "Step 1: Block in book forms, noting light direction. Step 2: Fill shadow planes with cool violet washes labeled with exact hex codes. Step 3: Apply warm stippled highlights along spines and annotate brush settings. Step 4: Add a radial vignette with gradient arrows showing intensity falloff. Step 5: Provide a two-column legend—cool mix vs warm mix—with leader lines pointing to representative areas."
 }
 
 {
   "object": "desk workspace",
   "equation": "Lighting = key + rim",
   "explanation": "Two-source lighting adds dimensionality.",
-  "guide": "Step 1: Draw arrows indicating key light direction and annotate their color temperature. Step 2: Highlight rim edges with a contrasting color strip and label thickness. Step 3: Render soft shadow gradients beneath objects with notes about feathering. Step 4: Place palette swatches for key and rim lights, linking them to the annotated edges. Step 5: Add a caption describing how the dual light scheme improves depth perception."
 }
 
 {
   "object": "water glass",
   "equation": "Palette = monochrome teal",
   "explanation": "Single hue with value shifts emphasizes transparency.",
-  "guide": "Step 1: Trace the glass with vertical contour hatching using a dark teal base. Step 2: Overlay vertical reflection bands in lighter teal and label them 'specular streaks'. Step 3: Draw circular ripples on the water surface with dashed lines and annotate their opacity. Step 4: Create a monochrome palette strip showing value progression along with usage notes. Step 5: Mark tiny white flecks for high-intensity highlights with instructions on brush pressure."
 }
 
 {
   "object": "earphones",
   "equation": "Composition ratio = 3:1 cable to buds",
   "explanation": "Use cable curves as leading lines.",
-  "guide": "Step 1: Plot the cable as a sweeping S-curve covering roughly three-quarters of the frame; mark the 3:1 ratio with measurement ticks. Step 2: Draw the buds as luminous nodes placed on rule-of-thirds intersections. Step 3: Indicate shadow drops beneath the cable with soft airbrush strokes and annotate blending directions. Step 4: Add arrows along the cable to show eye flow toward the buds. Step 5: Include notes on thickening vs tapering the line to emphasize depth."
 }
 
 {
   "object": "tea kettle",
   "equation": "Palette = (#1c1917, #d97706, #fef3c7) · Texture = brushed metal",
   "explanation": "Dark body with gold highlights and soft specular bloom.",
-  "guide": "Step 1: Outline the kettle and fill it with curved hatch marks following the form to mimic brushed metal. Step 2: Place palette chips near the body and connect them to usage zones (base fill, highlight, bloom). Step 3: Paint reflective streak overlays along the curvature with gradient arrows showing fade. Step 4: Render the steam plume in #fef3c7 and annotate it as 'bloom highlight'. Step 5: Add instructions on where to leave hard edges versus soft blends to capture metallic sheen."
+}"""
+
+ECO_EXAMPLE = """{
+  "object": "LED bulb",
+  "equation": "Annual CO₂ savings = baseline_incandescent - LED_usage",
+  "explanation": "Swapping a 60 W incandescent for a 9 W LED saves roughly 45 kg of CO₂ per year assuming three hours of daily use on an average US grid."
+}
+
+{
+  "object": "steel bottle",
+  "equation": "Refill payback ≈ (steel_embodied - single_use) / per_fill_savings",
+  "explanation": "After about 30 refills the stainless bottle repays its higher manufacturing footprint compared to buying a new disposable plastic bottle each trip."
+}
+
+{
+  "object": "cotton tote",
+  "equation": "Neutral trips ≈ manufacturing_emissions / plastic_bags_avoided",
+  "explanation": "A heavy cotton tote may need over 100 grocery runs before its footprint beats thin plastic bags, so longevity and frequent reuse matter."
+}
+
+{
+  "object": "dishwasher cycle",
+  "equation": "Water_saved = handwash_volume - machine_volume",
+  "explanation": "An Energy Star dishwasher uses about 3–4 gallons per load, whereas handwashing can exceed 15 gallons, so full loads cut both water and energy per plate."
+}"""
+
+CULTURAL_EXAMPLE = """{
+  "object": "ceramic tea bowl",
+  "equation": "Origin = Momoyama Japan · Meaning = wabi-sabi",
+  "explanation": "Raku bowls emerged in 16th-century Kyoto kilns; their asymmetry embodies wabi-sabi, the celebration of imperfection central to the tea ceremony."
+}
+
+{
+  "object": "mortar and pestle",
+  "equation": "Etymology = Latin mortarium · Regions = Mediterranean & West Africa",
+  "explanation": "The Roman mortarium described a grinding vessel; modern cousins like the Ghanaian asanka and Mexican molcajete show how the tool migrated across cuisines."
+}
+
+{
+  "object": "paisley scarf",
+  "equation": "Motif = Persian boteh · Route = Kashmir → Paisley",
+  "explanation": "The teardrop boteh symbol traveled from Sassanid Persia to Kashmiri shawls, then to Paisley, Scotland, whose mills industrialized the pattern in the 1800s."
+}
+
+{
+  "object": "origami crane",
+  "equation": "Symbol = senbazuru wishes · Era = Edo Japan",
+  "explanation": "Folding a thousand cranes (senbazuru) became a Japanese tradition for recovery and peace, especially after the story of Sadako Sasaki."
 }"""
 
 PHASE1_CONFIG = {
@@ -466,6 +530,8 @@ PHASE1_CONFIG = {
     "physicist": {"template": PHASE1_PROMPT_PHYSICS, "example": PHYSICIST_EXAMPLE},
     "biologist": {"template": PHASE1_PROMPT_BIOLOGY, "example": BIOLOGIST_EXAMPLE},
     "artist": {"template": PHASE1_PROMPT_ART, "example": ARTIST_EXAMPLE},
+    "eco": {"template": PHASE1_PROMPT_ECO, "example": ECO_EXAMPLE},
+    "cultural": {"template": PHASE1_PROMPT_CULTURAL, "example": CULTURAL_EXAMPLE},
 }
 
 
@@ -637,6 +703,48 @@ def generate_equation_facts(obj):
 @app.route(f"{API_PREFIX}/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
+
+
+@app.route(f"{API_PREFIX}/facts", methods=["POST"])
+def process_object_facts():
+    payload = request.get_json(silent=True) or {}
+    client_object_id = payload.get("clientObjectId") or str(uuid4())
+    lens_mode = resolve_lens_mode(payload.get("lensMode"))
+    label = (payload.get("label") or payload.get("object") or "").strip() or "object"
+    image_base64 = payload.get("imageBase64")
+
+    if not image_base64:
+        return jsonify({"error": "imageBase64 is required."}), 400
+
+    try:
+        image_path, image_url = persist_uploaded_image(image_base64, client_object_id, label)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    try:
+        phase1 = generate_equation_facts({
+            "object": label,
+            "image_url": image_url,
+            "lens_mode": lens_mode
+        })
+
+        if "equation" in phase1:
+            phase1["equation"] = clean_text_for_prompt(phase1["equation"])
+        explanation = clean_explanation(phase1.get("explanation", ""))
+
+        return jsonify({
+            "clientObjectId": client_object_id,
+            "lensMode": lens_mode,
+            "label": label,
+            "equation": phase1.get("equation"),
+            "explanation": explanation,
+            "imageUrl": image_url
+        })
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        print(f"❌ Facts generation error: {exc}")
+        return jsonify({"error": "Failed to generate facts.", "details": str(exc)}), 500
 
 
 @app.route(f"{API_PREFIX}/objects", methods=["POST"])

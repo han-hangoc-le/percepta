@@ -6,16 +6,27 @@ import Combine
 import UIKit
 import simd
 
+private enum LensPipeline {
+    case hologram
+    case infoOverlay
+}
+
 @MainActor
 final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate {
     @Published private(set) var overlays: [DetectionOverlay] = []
+    @Published private(set) var infoOverlays: [InfoOverlay] = []
     @Published var statusBanner: StatusBanner?
 
     let lensMode: String
+    var usesInfoPipeline: Bool { pipeline == .infoOverlay }
+    var infoAccentColor: Color { infoAccentColorValue }
 
+    private let pipeline: LensPipeline
     private let detector: YOLODetector
+    private let segmentationDetector: YOLOSegmentationDetector?
     private let tracker = ObjectTracker()
     private let processingService = ObjectProcessingService()
+    private let infoAccentColorValue: Color
 
     private weak var arView: ARView?
     private var viewportSize: CGSize = .zero
@@ -41,10 +52,24 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
 
     init(lensMode: String, modelFileName: String = "YOLOv8n") {
         self.lensMode = lensMode
+        self.pipeline = DetectionCoordinator.pipeline(for: lensMode)
+        self.infoAccentColorValue = DetectionCoordinator.accentColor(for: lensMode)
+
         do {
             detector = try YOLODetector(modelFileName: modelFileName)
         } catch {
             fatalError("Failed to load YOLO model: \(error)")
+        }
+
+        if pipeline == .infoOverlay {
+            do {
+                segmentationDetector = try YOLOSegmentationDetector()
+            } catch {
+                print("⚠️ Failed to load segmentation model: \(error.localizedDescription)")
+                segmentationDetector = nil
+            }
+        } else {
+            segmentationDetector = nil
         }
     }
 
@@ -62,6 +87,7 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
 
     func updateViewportSize(_ size: CGSize) {
         viewportSize = size
+        refreshInfoOverlayLayouts()
     }
 
     func setActive(_ active: Bool) {
@@ -79,6 +105,7 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
             detectionTask?.cancel()
             arView.session.pause()
             latestSnapshot = nil
+            infoOverlays.removeAll()
         }
     }
 
@@ -88,32 +115,8 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
         arView.session.run(worldConfiguration, options: options)
     }
 
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard isActive else { return }
-        let orientation = CGImagePropertyOrientation(deviceOrientation: UIDevice.current.orientation)
-        latestSnapshot = FrameSnapshot(pixelBuffer: frame.capturedImage,
-                                       orientation: orientation,
-                                       timestamp: frame.timestamp)
-    }
-
-    func handleTap(at viewPoint: CGPoint) {
-        guard isActive else {
-            publishError("Start the camera before selecting an object.")
-            return
-        }
-
-        guard viewportSize != .zero else {
-            publishError("Camera view is still sizing. Please try again.")
-            return
-        }
-
-        guard let snapshot = latestSnapshot else {
-            publishError("Need a fresh camera frame. Move the device slightly and tap again.")
-            return
-        }
-
+    private func runAnchoredPipeline(snapshot: FrameSnapshot, normalizedPoint: CGPoint?) {
         statusBanner = StatusBanner(message: "Analyzing selection...", tone: .info)
-        let normalizedPoint = normalizedVisionPoint(fromViewPoint: viewPoint)
         let detector = detector
 
         detectionTask?.cancel()
@@ -160,6 +163,121 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
         }
     }
 
+    private func runInfoPipeline(snapshot: FrameSnapshot, normalizedPoint: CGPoint?) {
+        statusBanner = StatusBanner(message: "Scanning objects...", tone: .info)
+
+        detectionTask?.cancel()
+        detectionTask = Task(priority: .userInitiated) { [weak self, snapshot, normalizedPoint] in
+            guard let self = self else { return }
+            guard let segmentationDetector = self.segmentationDetector else {
+                await self.publishError("Segmentation model unavailable.")
+                return
+            }
+
+            do {
+                let predictions = try await segmentationDetector.detect(on: snapshot.pixelBuffer,
+                                                                        orientation: snapshot.orientation)
+                guard !predictions.isEmpty else {
+                    await self.publishError("No objects detected in this frame.")
+                    return
+                }
+
+                let lightweight = predictions.map {
+                    YOLOPrediction(id: $0.id,
+                                   identifier: $0.label,
+                                   confidence: $0.confidence,
+                                   boundingBox: $0.boundingBox)
+                }
+
+                guard let selection = DetectionCoordinator.selectPrediction(near: normalizedPoint,
+                                                                            from: lightweight),
+                      let chosen = predictions.first(where: { $0.id == selection.id }) else {
+                    await self.publishError("Couldn't find an object at that location.")
+                    return
+                }
+
+                let overlayId = chosen.id
+                let viewRect = await MainActor.run { self.convertToViewRect(chosen.boundingBox) }
+
+                var overlay = InfoOverlay(id: overlayId,
+                                          normalizedBoundingBox: chosen.boundingBox,
+                                          rect: viewRect,
+                                          label: chosen.label,
+                                          confidence: chosen.confidence,
+                                          contourPath: chosen.contourPath,
+                                          equation: "Generating equation...",
+                                          explanation: "Fetching explanation...",
+                                          status: .loading)
+
+                await MainActor.run {
+                    self.infoOverlays = [overlay]
+                }
+
+                guard let imageData = ImageCropper.jpegData(from: snapshot.pixelBuffer,
+                                                            boundingBox: chosen.boundingBox,
+                                                            orientation: snapshot.orientation) else {
+                    await self.publishError("Failed to crop selection for upload.")
+                    return
+                }
+
+                let uploadRequest = ObjectUploadRequest(trackId: chosen.id,
+                                                        label: chosen.label,
+                                                        confidence: chosen.confidence,
+                                                        boundingBox: chosen.boundingBox,
+                                                        imageData: imageData)
+
+                let facts = try await self.processingService.fetchFacts(request: uploadRequest,
+                                                                        lensMode: self.lensMode)
+
+                await MainActor.run {
+                    self.applyFacts(facts)
+                    self.statusBanner = StatusBanner(message: "Overlay updated with insights.", tone: .info)
+                }
+            } catch is CancellationError {
+                return
+            } catch {
+                await self.publishError("Segmentation failed: \(error.localizedDescription)")
+                await MainActor.run {
+                    self.markInfoOverlayFailed("Unable to fetch lens data.")
+                }
+            }
+        }
+    }
+
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        guard isActive else { return }
+        let orientation = CGImagePropertyOrientation(deviceOrientation: UIDevice.current.orientation)
+        latestSnapshot = FrameSnapshot(pixelBuffer: frame.capturedImage,
+                                       orientation: orientation,
+                                       timestamp: frame.timestamp)
+    }
+
+    func handleTap(at viewPoint: CGPoint) {
+        guard isActive else {
+            publishError("Start the camera before selecting an object.")
+            return
+        }
+
+        guard viewportSize != .zero else {
+            publishError("Camera view is still sizing. Please try again.")
+            return
+        }
+
+        guard let snapshot = latestSnapshot else {
+            publishError("Need a fresh camera frame. Move the device slightly and tap again.")
+            return
+        }
+
+        let normalizedPoint = normalizedVisionPoint(fromViewPoint: viewPoint)
+
+        switch pipeline {
+        case .hologram:
+            runAnchoredPipeline(snapshot: snapshot, normalizedPoint: normalizedPoint)
+        case .infoOverlay:
+            runInfoPipeline(snapshot: snapshot, normalizedPoint: normalizedPoint)
+        }
+    }
+
     @MainActor
     private func prepareFrameUpdate(predictions: [YOLOPrediction],
                                     snapshot: FrameSnapshot) -> [ObjectUploadRequest] {
@@ -199,8 +317,17 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
         return uploadRequests
     }
 
+    private func refreshInfoOverlayLayouts() {
+        guard usesInfoPipeline, viewportSize != .zero, !infoOverlays.isEmpty else { return }
+        infoOverlays = infoOverlays.map { overlay in
+            var updated = overlay
+            updated.rect = convertToViewRect(overlay.normalizedBoundingBox)
+            return updated
+        }
+    }
+
     private func updateOverlays(with tracks: [ObjectTrack]) {
-        guard viewportSize != .zero else { return }
+        guard viewportSize != .zero, pipeline == .hologram else { return }
         overlays = tracks.map { track in
             let rect = convertToViewRect(track.boundingBox)
             let submissionState = objectStates[track.id]?.submissionState ?? .idle
@@ -310,6 +437,25 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
                                            confidence: overlay.confidence,
                                            submissionState: submissionState,
                                            overlayImage: overlayImage)
+    }
+
+    private func applyFacts(_ facts: LensFactResult) {
+        guard let index = infoOverlays.firstIndex(where: { $0.id == facts.trackId }) else { return }
+        infoOverlays[index].equation = facts.equation
+        infoOverlays[index].explanation = facts.explanation
+        infoOverlays[index].status = .loaded
+    }
+
+    private func markInfoOverlayFailed(_ message: String) {
+        guard !infoOverlays.isEmpty else { return }
+        infoOverlays = infoOverlays.map { overlay in
+            var updated = overlay
+            updated.status = .failed(message)
+            if (overlay.explanation?.isEmpty ?? true) {
+                updated.explanation = message
+            }
+            return updated
+        }
     }
 
     private func placeAnchor(for trackId: UUID, image: UIImage) {
@@ -422,6 +568,18 @@ final class DetectionCoordinator: NSObject, ObservableObject, ARSessionDelegate 
         let dx = lhs.x - rhs.x
         let dy = lhs.y - rhs.y
         return (dx * dx) + (dy * dy)
+    }
+
+    private static func pipeline(for lensMode: String) -> LensPipeline {
+        let infoModes: Set<String> = ["biologist", "artist", "ecologist", "cultural"]
+        return infoModes.contains(lensMode.lowercased()) ? .infoOverlay : .hologram
+    }
+
+    private static func accentColor(for lensMode: String) -> Color {
+        if let lens = LENS_MODES.first(where: { $0.id == lensMode }) {
+            return Color(hex: lens.color)
+        }
+        return Color.cyan
     }
 
     private func publishError(_ message: String) {

@@ -11,7 +11,7 @@ struct HomeScreen: View {
                 Color(hex: "#0f172a").ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("WorldLens")
+                    Text("Percepta")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(Color(hex: "#e0f2fe"))
                         .padding(.top, 12)

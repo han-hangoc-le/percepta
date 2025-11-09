@@ -23,6 +23,25 @@ struct DetectionOverlay: Identifiable {
     let overlayImage: UIImage?
 }
 
+enum InfoOverlayStatus: Equatable {
+    case idle
+    case loading
+    case loaded
+    case failed(String)
+}
+
+struct InfoOverlay: Identifiable {
+    let id: UUID
+    let normalizedBoundingBox: CGRect
+    var rect: CGRect
+    let label: String
+    let confidence: Float
+    var contourPath: CGPath?
+    var equation: String?
+    var explanation: String?
+    var status: InfoOverlayStatus = .idle
+}
+
 struct StatusBanner: Identifiable {
     let id = UUID()
     let message: String

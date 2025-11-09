@@ -38,5 +38,19 @@ let LENS_MODES: [LensMode] = [
         icon: "🎨",
         color: "#f59e0b",
         description: "Highlight palettes, composition tricks, and creative prompts to inspire your next masterpiece."
+    ),
+    LensMode(
+        id: "ecologist",
+        name: "Ecologist",
+        icon: "🌿",
+        color: "#22c55e",
+        description: "Observe interactions between species, energy flows, and balance in natural ecosystems."
+    ),
+    LensMode(
+        id: "cultural",
+        name: "Cultural Analyst",
+        icon: "🏺",
+        color: "#ef4444",
+        description: "Decode traditions, symbols, and social meanings embedded in everyday human activity."
     )
 ]

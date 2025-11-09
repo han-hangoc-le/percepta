@@ -22,6 +22,14 @@ struct ObjectProcessingResponse: Codable {
     var message: String?
 }
 
+struct LensFactResponse: Codable {
+    var clientObjectId: String
+    var lensMode: String
+    var label: String
+    var equation: String?
+    var explanation: String?
+}
+
 struct DetectionResult {
     var objects: [DetectedObject]
     var lensMode: String
@@ -235,6 +243,32 @@ final class APIService {
     func checkHealth() async throws -> HealthResponse {
         do {
             return try await request("/health", method: "GET", retries: 0, responseType: HealthResponse.self)
+        } catch {
+            throw toApiError(error)
+        }
+    }
+
+    func fetchLensFacts(payload: ObjectUploadPayload) async throws -> LensFactResponse {
+        do {
+            return try await request(
+                "/facts",
+                method: "POST",
+                body: [
+                    "clientObjectId": payload.clientObjectId,
+                    "lensMode": payload.lensMode,
+                    "label": payload.label,
+                    "confidence": payload.confidence,
+                    "boundingBox": [
+                        "x": payload.boundingBox.x,
+                        "y": payload.boundingBox.y,
+                        "width": payload.boundingBox.width,
+                        "height": payload.boundingBox.height
+                    ],
+                    "imageBase64": payload.imageBase64
+                ],
+                retries: maxRetries,
+                responseType: LensFactResponse.self
+            )
         } catch {
             throw toApiError(error)
         }

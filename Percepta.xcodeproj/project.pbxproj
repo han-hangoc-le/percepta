@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B454C5D2EC0846700774762 /* yolov8n-seg.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 8B454C5C2EC0846700774762 /* yolov8n-seg.mlpackage */; };
 		8BBF67102EBFBA0900C8D70D /* yolov8n.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 8BBF670F2EBFBA0900C8D70D /* yolov8n.mlpackage */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8B454C5C2EC0846700774762 /* yolov8n-seg.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "yolov8n-seg.mlpackage"; sourceTree = "<group>"; };
 		8BBF670F2EBFBA0900C8D70D /* yolov8n.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = yolov8n.mlpackage; sourceTree = "<group>"; };
 		8BCC55652EBEEF3800F548C7 /* Percepta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Percepta.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BCC55742EBEEF3B00F548C7 /* PerceptaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PerceptaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +95,7 @@
 		8BCC555C2EBEEF3800F548C7 = {
 			isa = PBXGroup;
 			children = (
+				8B454C5C2EC0846700774762 /* yolov8n-seg.mlpackage */,
 				8BBF670F2EBFBA0900C8D70D /* yolov8n.mlpackage */,
 				8BCC55672EBEEF3800F548C7 /* Percepta */,
 				8BCC55772EBEEF3B00F548C7 /* PerceptaTests */,
@@ -255,6 +258,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B454C5D2EC0846700774762 /* yolov8n-seg.mlpackage in Sources */,
 				8BBF67102EBFBA0900C8D70D /* yolov8n.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

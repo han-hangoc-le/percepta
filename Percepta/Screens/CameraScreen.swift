@@ -28,8 +28,14 @@ struct CameraScreen: View {
                             detectionCoordinator.setActive(false)
                         }
 
-                    DetectionOverlayView(overlays: detectionCoordinator.overlays)
-                        .frame(width: proxy.size.width, height: proxy.size.height)
+                    if detectionCoordinator.usesInfoPipeline {
+                        InfoOverlayView(overlays: detectionCoordinator.infoOverlays,
+                                        accentColor: detectionCoordinator.infoAccentColor)
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                    } else {
+                        DetectionOverlayView(overlays: detectionCoordinator.overlays)
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                    }
                 }
                 .onChange(of: proxy.size) { newSize in
                     viewSize = newSize
