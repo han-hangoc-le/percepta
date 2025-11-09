@@ -8,17 +8,26 @@ struct HomeScreen: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#0f172a").ignoresSafeArea()
+                Color(hex: "#f8fafc").ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Percepta")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(Color(hex: "#e0f2fe"))
-                        .padding(.top, 12)
+                    HStack(spacing: 16) {
+                        Image("PerceptaLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 56, height: 56)
+                            .shadow(color: Color.black.opacity(0.35), radius: 8, y: 4)
+
+                        Image("PerceptaLine")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 34)
+                    }
+                    .padding(.top, 12)
                     
                     Text("Choose a lens mode to transform the world through knowledge and humor.")
                         .font(.system(size: 16))
-                        .foregroundColor(Color(hex: "#cbd5f5"))
+                        .foregroundColor(Color(hex: "#1e293b"))
                     
                     LensSelectorView(
                         lenses: LENS_MODES,

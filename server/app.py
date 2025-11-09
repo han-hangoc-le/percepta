@@ -217,25 +217,12 @@ Example output:
 {example}
 """
 
-MATHEMATICIAN_EXAMPLE = """{
+MATHEMATICIAN_EXAMPLE = """
+{
   "object": "bottle",
   "equation": "V = πr²h",
   "explanation": "Volume of a cylinder where r is radius and h is height.",
   "guide": "Step 1: Overlay a transparent cylinder matching the bottle silhouette and highlight the central axis. Step 2: Draw a radial arrow from the axis to the rim to mark r, attach a floating label, and add a semicircular arc referencing π. Step 3: Extend a vertical arrow along the axis for h with tick marks at the top and bottom surfaces. Step 4: Draw a dashed disk on the base to show πr² and annotate it with 'base area'. Step 5: Place the equation V = πr²h in a mini HUD panel under the bottle with bullet notes explaining each variable and an arrow linking the HUD to the respective geometry."
-}
-
-{
-  "object": "spiral notebook",
-  "equation": "Area = w x h",
-  "explanation": "Surface area of the notebook cover treated as a rectangle.",
-  "guide": "Step 1: Flatten the notebook cover into an orthographic rectangle with a subtle grid overlay. Step 2: Use a bold horizontal arrow to mark width w along the lower edge and a vertical arrow for height h on the right edge; both arrows get labeled tabs with tiny scale ticks. Step 3: Shade the rectangle with unit squares to imply multiplication of w and h. Step 4: Draw a floating equation card at the corner containing Area = w × h plus short reminders 'w = horizontal span' and 'h = vertical span'. Step 5: Add faint leader lines from the card back to the measurement arrows to reinforce the relationship."
-}
-
-{
-  "object": "shipping box",
-  "equation": "Surface area = 2(lw + lh + wh)",
-  "explanation": "Total exposed cardboard on a rectangular prism.",
-  "guide": "Step 1: Sketch the box in isometric wireframe and lightly tint each face. Step 2: Use color-coded arrows to tag length l, width w, and height h on the box edges. Step 3: Show an exploded net diagram next to the box with corresponding colored panels representing lw, lh, and wh. Step 4: Draw braces summarizing lw + lh + wh and another brace labelled '×2' to illustrate the paired faces. Step 5: Include the full formula in a HUD with bullet annotations: 'lw = front/back', 'lh = sides', 'wh = top/bottom', each pointing to the respective net panels."
 }
 
 {
@@ -246,237 +233,144 @@ MATHEMATICIAN_EXAMPLE = """{
 }
 
 {
-  "object": "laptop screen",
-  "equation": "Diagonal² = w² + h²",
-  "explanation": "Pythagorean relationship of the display dimensions.",
+  "object": "laptop",
+  "equation": "d² = w² + h²",
+  "explanation": "Screen diagonal relates orthogonal width and height via the Pythagorean theorem.",
   "guide": "Step 1: Outline the laptop display in perspective, adding corner anchors. Step 2: Draw width w along the bottom bezel and height h up the side, each with measurement arrows and tick marks. Step 3: Stretch a contrasting diagonal arrow from lower-left to upper-right and label it d. Step 4: Insert a glowing right-angle marker in the lower-left corner to tie w and h together. Step 5: Present the equation d² = w² + h² in a floating card that includes mini bullet text explaining how squaring w and h sums to the diagonal, with leader lines pointing to the respective arrows."
 }
 
 {
-  "object": "traffic cone",
-  "equation": "Volume = (1/3)πr²h",
-  "explanation": "Standard cone volume formula.",
-  "guide": "Step 1: Render the cone as a transparent shell showing the central axis. Step 2: Project radius r from the axis to the base rim and label it using a curved arrow that hugs the base circle. Step 3: Draw height h along the axis with arrows at both ends and note the ground reference plane. Step 4: Slice out a narrow wedge and display it next to the cone to illustrate rotational symmetry; annotate (1/3) as 'one-third of cylinder'. Step 5: Place the full formula beside the wedge with bullet notes mapping πr² to the base disk and h to the axis arrow."
+  "object": "chair",
+  "equation": "Load per leg = W / 4",
+  "explanation": "A four-legged chair ideally splits the sitter's weight evenly between legs.",
+  "guide": "Step 1: Render the chair with a top-down inset showing the rectangular footprint. Step 2: Draw a single downward vector W centered on the seat. Step 3: Branch that vector into four equal arrows aligned with each leg, labeling them W/4. Step 4: Add a small equation card near one leg showing W ÷ 4 and connect it back to the main weight vector. Step 5: Include a balance note explaining that uneven floors shift the ratio, but the baseline calculation assumes symmetric contact."
 }
 
 {
-  "object": "bookshelf",
-  "equation": "Capacity = shelf_width × shelf_depth × shelf_count",
-  "explanation": "Approximate storage volume using rectangular prism layers.",
-  "guide": "Step 1: Draw the bookshelf in perspective with each shelf rendered semi-transparent. Step 2: Use a horizontal arrow for shelf_width across the front edge and a perpendicular arrow for shelf_depth pointing into the shelf. Step 3: Stack numbered markers along one side to indicate shelf_count, connecting them with a dashed vertical axis. Step 4: Fill the shelf volume with a faint voxel grid to show discrete storage cells. Step 5: Display the capacity equation in a HUD with checkboxes linking each term to the visual measurement arrows and shelf stack."
+  "object": "bowl",
+  "equation": "C = 2πr",
+  "explanation": "Circumference of the circular rim with radius r.",
+  "guide": "Step 1: Trace the rim of the bowl with a glowing circle and mark its center. Step 2: Draw a radius arrow r from the center to the rim, labeling both ends. Step 3: Wrap a dashed measurement tape around the rim to represent circumference C and tag the tape with arrowheads to show continuity. Step 4: Add a mini arc annotation describing how the radius sweeps the full circle. Step 5: Place the equation C = 2πr beside the tape, with leader lines from 2π to the full circle and from r to the radius arrow."
 }
 
 {
-  "object": "picture frame",
-  "equation": "Perimeter = 2(w + h)",
-  "explanation": "Total trim length around a rectangle.",
-  "guide": "Step 1: Trace a glowing path around the frame border to represent the perimeter loop. Step 2: Label width w along the top and bottom edges with directional arrows and label height h on the sides. Step 3: Place small corner markers to emphasize the path turning points. Step 4: Unfold the perimeter into a straight line graphic showing two segments of w and two of h, with the bracket '2(w + h)' hovering above. Step 5: Add callouts describing how to cut molding pieces to match these lengths, linking them back to the edges."
+  "object": "potted plant",
+  "equation": "Soil volume = πr²h",
+  "explanation": "Approximate cylindrical pot interior by radius r and soil height h.",
+  "guide": "Step 1: Draw the planter with a cutaway revealing the soil column. Step 2: Highlight the circular base and add a radius arrow r from center to rim. Step 3: Mark soil depth h with a vertical arrow from the base to the surface. Step 4: Tint the soil region to emphasize the volume being measured. Step 5: Display πr²h in a HUD bubble with icons linking πr² to the base disk and h to the vertical arrow, reinforcing how the pot's geometry controls capacity."
 }
-
-{
-  "object": "cylindrical stool",
-  "equation": "Surface area = 2πr² + 2πrh",
-  "explanation": "Top and bottom circles plus side wrap.",
-  "guide": "Step 1: Illustrate the stool and overlay top and bottom circular outlines with labels 'πr² each'. Step 2: Unwrap the lateral surface into a rectangle adjacent to the stool, marking its width as circumference 2πr and its height as h. Step 3: Color-code the circles and the rectangle to match the terms in the formula. Step 4: Add arrows showing how the lateral rectangle wraps back around the stool surface. Step 5: Display the full equation with braces grouping the circular and lateral components, plus annotations referencing the color codes."
-}
-
-{
-  "object": "planter pot",
-  "equation": "V = (πh/3)(R² + Rr + r²)",
-  "explanation": "Volume of a truncated cone with outer radius R and inner radius r.",
-  "guide": "Step 1: Cut the pot vertically to reveal interior and exterior walls. Step 2: Mark the upper radius R with a horizontal arrow across the rim and the lower radius r across the base interior. Step 3: Draw height h along the centerline and note the soil level. Step 4: Add three stacked circular slices (top, mean, bottom) to illustrate the R², Rr, and r² terms, connecting them with dashed guides. Step 5: Place the frustum formula adjacent to the slices with bullet notes mapping each term to the visual slices and emphasizing the (πh/3) scalar."
-}"""
+"""
 
 PHYSICIST_EXAMPLE = """{
-  "object": "rolling ball",
-  "equation": "F = m · a",
-  "explanation": "Net force equals mass times acceleration.",
-  "guide": "Step 1: Trace the ball with a translucent outline aligned to the motion direction. Step 2: Draw a thick red force vector pointing forward; annotate its base with 'F'. Step 3: Add a smaller yellow acceleration vector parallel to the force arrow but slightly offset; label it 'a'. Step 4: Place a floating mass tag 'm' near the ball and connect it to the object's center of mass. Step 5: Show the equation F = m·a in a rectangular HUD above the ball with arrows linking each symbol to the corresponding visual element."
+  "object": "laptop",
+  "equation": "P = V·I",
+  "explanation": "Electrical power equals supply voltage times current draw.",
+  "guide": "Step 1: Outline the laptop chassis in orthographic view and highlight the power jack. Step 2: Draw a voltage vector entering the device and label it V near the adapter port. Step 3: Add a current arrow I flowing toward the internal circuitry with a thin glowing path. Step 4: Annotate the battery pack and motherboard zones to show where the energy is consumed. Step 5: Place a HUD card with P = V·I, using leader lines from V to the adapter arrow and from I to the internal current path, with the final power value linked to the screen backlight."
 }
 
 {
-  "object": "swinging pendulum",
-  "equation": "T = 2π√(L/g)",
-  "explanation": "Period of a simple pendulum with length L.",
-  "guide": "Step 1: Render the pendulum at maximum displacement; overlay the circular arc path with tick marks. Step 2: Draw the string length L as a highlighted segment from pivot to bob and label it. Step 3: Add vectors for tension (along the string) and gravity (vertical downward) plus the tangential restoring component. Step 4: Include a curved arrow showing direction of swing and annotate it with period T. Step 5: Display the period formula in a HUD with mini notes 'L controls arc length' and 'g defines gravitational restoring strength'."
+  "object": "bottle",
+  "equation": "P = ρgh",
+  "explanation": "Hydrostatic pressure increases with fluid density, gravity, and depth.",
+  "guide": "Step 1: Render the bottle upright with a transparent fluid interior. Step 2: Add a vertical depth arrow h measured from the surface to a sample point near the base. Step 3: Show density ρ as a floating tag attached to the fluid column and gravity g as a downward arrow outside the bottle. Step 4: Apply a color gradient inside the liquid that darkens toward the base to visualize increasing pressure. Step 5: Present P = ρgh in a panel beside the bottle with connectors from each symbol to the respective depth arrow, density tag, and gravity vector."
 }
 
 {
-  "object": "sliding block",
-  "equation": "F_friction = μN",
-  "explanation": "Frictional force equals coefficient times normal force.",
-  "guide": "Step 1: Outline the block on the surface and draw a free-body diagram: gravity vector downward, normal vector upward, applied force to the right, friction to the left. Step 2: Color-code friction in red and normal force in blue, adding labels 'F_f' and 'N'. Step 3: Insert a coefficient μ tag near the contact surface with dotted arrows referencing microscopic contact. Step 4: Add a HUD summarizing 'F_f = μN' and include sliders for μ and N to reinforce their multiplicative relationship. Step 5: Provide a ground plane grid showing direction of motion and frictional opposition."
+  "object": "chair",
+  "equation": "σ = F / A",
+  "explanation": "Mechanical stress equals applied force divided by contact area.",
+  "guide": "Step 1: Draw the chair legs with a cutaway showing the area A where they meet the floor. Step 2: Add the weight force F as a downward vector centered on the seat. Step 3: Highlight the footprint patch on the floor and label it with area brackets. Step 4: Use a heat-map overlay along the legs to show how stress travels from the seat to the ground. Step 5: Place the formula σ = F / A in a HUD near the footprint, with arrows connecting F to the load vector and A to the highlighted contact patch."
 }
 
 {
-  "object": "seesaw",
+  "object": "microwave oven",
+  "equation": "E = h·f",
+  "explanation": "Photon energy is Planck's constant times microwave frequency.",
+  "guide": "Step 1: Depict the microwave door slightly transparent to reveal the cavity. Step 2: Draw standing-wave patterns inside the cavity, marking successive peaks with wavelength brackets. Step 3: Add an antenna icon where the magnetron injects radiation and label the emitted frequency f. Step 4: Place Planck's constant h in a side legend with a note linking it to quantum energy packets. Step 5: Display E = h·f in a floating card above the oven, using dotted leaders from f to the wave pattern and from h to the legend, emphasizing the resulting photon energy reaching the food."
+}
+
+{
+  "object": "bicycle",
   "equation": "τ = r × F",
-  "explanation": "Torque equals lever arm times force.",
-  "guide": "Step 1: Draw the seesaw with pivot highlighted and two masses on either side. Step 2: From the pivot, draw lever arm vectors r1 and r2 pointing to each contact point. Step 3: Add downward force vectors corresponding to each child, labeled F1 and F2. Step 4: Illustrate torques as curved arrows around the pivot, with direction indicating rotation tendency. Step 5: Present τ = r × F near the pivot with annotations 'r = distance from fulcrum' and 'F = applied load', linking them to the vectors."
-}
-
-{
-  "object": "bicycle wheel",
-  "equation": "a_c = v² / r",
-  "explanation": "Centripetal acceleration for circular motion.",
-  "guide": "Step 1: Highlight the wheel rim with luminous segments indicating circular path. Step 2: Draw tangent velocity vectors v at several evenly spaced points along the rim. Step 3: Add inward acceleration arrows a_c pointing toward the hub, differentiating them by color. Step 4: Overlay a dashed circle showing the path radius r and label it near the hub. Step 5: Show the equation a_c = v² / r in a HUD with bullet notes describing how increasing v or decreasing r raises inward acceleration."
-}
-
-{
-  "object": "desk lamp hinge",
-  "equation": "τ = Iα",
-  "explanation": "Rotational analogue of Newton's second law.",
-  "guide": "Step 1: Depict the lamp arm as rigid segments with the hinge highlighted as the pivot. Step 2: Add a curved arrow around the hinge showing angular acceleration α, labeled at the arc center. Step 3: Represent the moment of inertia I as a block diagram near the arm, connected with dotted lines to the mass distribution. Step 4: Include a torque vector τ at the pivot pointing along the axis of rotation. Step 5: Display τ = Iα beside the hinge with annotations tying α to the curved arrow and I to the mass distribution overlay."
-}
-
-{
-  "object": "coffee steam plume",
-  "equation": "Q = m c ΔT",
-  "explanation": "Heat transfer in the rising vapor.",
-  "guide": "Step 1: Outline the cup and render the steam as volumetric ribbons rising upward. Step 2: Use gradient arrows traveling through the plume to indicate heat flow direction; label them Q. Step 3: Tag a column of steam with mass m and annotate a side panel showing c (specific heat). Step 4: Place temperature markers near the cup surface and the plume top to show ΔT. Step 5: Insert the equation Q = m c ΔT into a floating panel with bullet text explaining each variable, and connect the panel to the corresponding visual markers."
-}
-
-{
-  "object": "toy car on ramp",
-  "equation": "v² = u² + 2as",
-  "explanation": "Kinematics equation for constant acceleration.",
-  "guide": "Step 1: Draw the ramp with a distance axis along the incline labeled s and evenly spaced markers. Step 2: Place a toy car at the start with velocity vector u and near the bottom with velocity vector v. Step 3: Draw an acceleration component arrow along the slope pointing downhill. Step 4: Add a timeline strip or progress bar at the base to match positions to time. Step 5: Show the equation v² = u² + 2as above the ramp with color-coded links to the initial velocity, acceleration, and displacement annotations."
-}
-
-{
-  "object": "dam spillway",
-  "equation": "Pressure = ρgh",
-  "explanation": "Hydrostatic pressure at depth h.",
-  "guide": "Step 1: Render a vertical cross-section of the dam wall and the adjacent water column. Step 2: Apply a blue-to-purple gradient across the water, increasing with depth to visualize pressure. Step 3: Draw a depth arrow h from the surface down to a sample point and label it. Step 4: Include density ρ and gravity g as icons in a side legend with arrows pointing to the water mass and downward vector, respectively. Step 5: Display P = ρgh in a HUD and link each variable to its visual cue with leader lines."
-}
-
-{
-  "object": "speaker cone",
-  "equation": "v = λf",
-  "explanation": "Wave speed equals wavelength times frequency.",
-  "guide": "Step 1: Outline the speaker cone and show it vibrating forward. Step 2: Visualize concentric wavefronts radiating outward with alternating light/dark rings. Step 3: Mark the distance between successive peaks as wavelength λ with a double-headed arrow and annotate it. Step 4: Include a frequency indicator f in a HUD, perhaps a bar showing beats per second, tied to the speaker motion. Step 5: Draw a velocity arrow v pointing outward along the wave normal and place the equation v = λf beside it with explanatory bullet points."
+  "explanation": "Wheel torque equals crank radius times applied pedal force.",
+  "guide": "Step 1: Show the bicycle from the side with the crank arm highlighted. Step 2: Draw a radius vector r from the crank center to the pedal. Step 3: Add the rider's foot force F as a downward arrow on the pedal. Step 4: Illustrate the resulting torque τ as a curved arrow about the crank spindle, feeding into the chainring. Step 5: Present τ = r × F next to the crankset, with color-coded leader lines linking r to the radius vector and F to the pedal force, while a note explains how the torque drives the chain."
 }"""
 
-BIOLOGIST_EXAMPLE = """{
-  "object": "leaf",
-  "equation": "Transpiration rate = Stomatal conductance × Vapor pressure deficit",
-  "explanation": "Water escapes through stomata on the underside of the blade. The flux scales with both how wide the pores open and how dry the surrounding air is."
+BIOLOGIST_EXAMPLE = """
+{
+  "object": "person",
+  "equation": "Heat loss ∝ surface_area × ΔT",
+  "explanation": "Standing humans radiate more warmth when uncovered skin area is large and the air temperature drops, so limbs act as major heat-exchange fins."
 }
 
 {
-  "object": "tree trunk",
-  "equation": "Sap flow = πr² × upward_velocity",
-  "explanation": "The conducting xylem ring provides cross-sectional area πr², so thicker trunks move more sap when upward velocity from transpiration pull stays the same."
+  "object": "dog",
+  "equation": "Panting rate ∝ metabolic_heat / airflow",
+  "explanation": "Dogs evaporate saliva across the tongue to dump excess heat; more internal heat or less airflow forces faster panting to keep body temperature stable."
 }
 
 {
-  "object": "flower stamen",
-  "equation": "Pollen release rate = aperture_area × wind_speed",
-  "explanation": "Broader anther openings expose more pollen grains to airflow. Even gentle breezes loft grains efficiently when the aperture area is large."
+  "object": "cat",
+  "equation": "Jump impulse = m × Δv",
+  "explanation": "When a cat launches from a sofa, leg muscles deliver an impulse equal to mass times the change in velocity, letting it reach shelves without sprinting laps."
 }
 
 {
-  "object": "mushroom gill",
-  "equation": "Spore count = gill_area × spore_density",
-  "explanation": "Sample a gill, count spores per square millimeter, then multiply by total gill area to estimate nightly spore rain."
+  "object": "bird",
+  "equation": "Lift ≈ ½ρv²S C_L",
+  "explanation": "Even perched birds reveal wing architecture: the same surface area S and camber that keeps them aloft also dictates the minimum airflow needed for takeoff."
 }
 
 {
-  "object": "coral branch",
-  "equation": "Photosynthesis ∝ light_intensity × chlorophyll_fraction",
-  "explanation": "Polyps packed with algae convert light into sugar efficiently. Bleached tissue with low chlorophyll yields far less energy."
+  "object": "cow",
+  "equation": "Rumen gas ∝ fiber_intake × microbiome_activity",
+  "explanation": "Chewing cud loads the rumen with cellulose; resident microbes ferment it and release methane, so diets richer in fiber drive higher gas production."
 }
 
 {
-  "object": "bee wing",
-  "equation": "Wingbeat frequency = airflow_velocity / stroke_amplitude",
-  "explanation": "Smaller stroke arcs demand higher beat frequency to maintain lift for the same airflow velocity when hovering near flowers."
+  "object": "potted plant",
+  "equation": "Transpiration rate = stomatal_conductance × VPD",
+  "explanation": "Houseplants pull water upward when stomata stay open and the vapor-pressure deficit (dryness gap) is high, moving moisture from soil to room air even indoors."
+}
+"""
+
+ARTIST_EXAMPLE = """
+{
+  "object": "bottle",
+  "equation": "Palette = (#0f172a, #38bdf8, #e0f2fe) · Highlight = rim specular",
+  "explanation": "Deep navy surroundings make the aqua liquid glow; pick out the rim with a cool highlight to separate glass from background."
 }
 
 {
-  "object": "human hand",
-  "equation": "Blood flow = ΔP / vascular_resistance",
-  "explanation": "A pressure drop from wrist to fingertips pushes blood through capillaries. Cold-induced vasoconstriction raises resistance, lowering flow even if ΔP stays constant."
-}
-
-{
-  "object": "butterfly wing",
-  "equation": "Scale overlap ratio = scale_width / scale_pitch",
-  "explanation": "Large width relative to pitch packs more scales into each row, stacking reflective plates that intensify iridescent shimmer."
-}
-
-{
-  "object": "snail shell",
-  "equation": "Radius = initial_radius × e^{kθ}",
-  "explanation": "The shell follows a logarithmic spiral: every increment in angle θ expands radius exponentially with growth constant k, mirroring mantle secretion."
-}
-
-{
-  "object": "seedling root",
-  "equation": "Osmotic influx = k × (Ψ_soil - Ψ_root)",
-  "explanation": "Water flows into root hairs when soil water potential exceeds the root interior. Dry soil narrows the potential gap and slows the inflow."
-}"""
-
-ARTIST_EXAMPLE = """{
-  "object": "coffee cup",
-  "equation": "Palette = (#f5e9db, #c28455, #2f1b0c) · Composition = 2:1 negative space ratio",
-  "explanation": "Warm ceramics pop against a cool tabletop when you give the frame breathing room.",
-}
-
-{
-  "object": "street lamp",
-  "equation": "Palette = (#0f172a, #fbbf24, #ecfccb)",
-  "explanation": "Midnight blues contrasting with sodium glow and soft foliage accents.",
-}
-
-{
-  "object": "window plant",
-  "equation": "Composition = diagonal flow",
-  "explanation": "Leaves guide the viewer from lower-left to upper-right.",
-}
-
-{
-  "object": "bowl of fruit",
-  "equation": "Palette = (#f97316, #facc15, #fef9c3) · Rhythm = repeating crescents",
-  "explanation": "Warm triadic palette with echoing curved shapes.",
+  "object": "vase",
+  "equation": "Composition = centered vertical · Texture = matte vs gloss",
+  "explanation": "Keep the vase upright on the midline and contrast a matte wall with glossy ceramic reflections to lead the eye upward."
 }
 
 {
   "object": "bicycle",
   "equation": "Rule-of-thirds anchors = saddle & front hub",
-  "explanation": "Place critical features on grid intersections.",
+  "explanation": "Place the saddle on the upper-left intersection and the front hub on the lower-right to stretch the frame diagonally across the canvas."
 }
 
 {
-  "object": "book stack",
-  "equation": "Contrast = cool shadows vs warm covers",
-  "explanation": "Push chroma difference to create depth.",
+  "object": "dining table",
+  "equation": "Rhythm = repeating rectangles",
+  "explanation": "Plates, placemats, and chair backs echo rectangular beats; align them to create a steady left-to-right cadence."
 }
 
 {
-  "object": "desk workspace",
-  "equation": "Lighting = key + rim",
-  "explanation": "Two-source lighting adds dimensionality.",
+  "object": "book",
+  "equation": "Contrast = warm cover vs cool shadow",
+  "explanation": "Prop the book open near a window so the cover catches warm light while pages fall into blue-gray shade, emphasizing depth."
 }
 
 {
-  "object": "water glass",
-  "equation": "Palette = monochrome teal",
-  "explanation": "Single hue with value shifts emphasizes transparency.",
+  "object": "couch",
+  "equation": "Palette = (#f4f1ed, #c08457, #1f2933) · Balance = asymmetrical pillows",
+  "explanation": "Use a light base fabric, caramel leather accents, and charcoal wall, then offset the frame with pillows grouped on one side for casual balance."
 }
-
-{
-  "object": "earphones",
-  "equation": "Composition ratio = 3:1 cable to buds",
-  "explanation": "Use cable curves as leading lines.",
-}
-
-{
-  "object": "tea kettle",
-  "equation": "Palette = (#1c1917, #d97706, #fef3c7) · Texture = brushed metal",
-  "explanation": "Dark body with gold highlights and soft specular bloom.",
-}"""
-
+"""
 ECO_EXAMPLE = """{
   "object": "LED bulb",
   "equation": "Annual CO₂ savings = baseline_incandescent - LED_usage",
