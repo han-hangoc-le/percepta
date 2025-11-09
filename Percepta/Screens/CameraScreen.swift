@@ -3,20 +3,41 @@ import AVFoundation
 
 struct CameraScreen: View {
     @Environment(\.dismiss) var dismiss
-    @State private var isCapturing: Bool = false
-    @State private var statusMessage: String? = nil
-    @State private var statusTone: StatusTone = .info
+    @StateObject private var detectionCoordinator: DetectionCoordinator
+    @State private var viewSize: CGSize = .zero
 
-    var lensMode: String
+    let lensMode: String
+
+    init(lensMode: String) {
+        self.lensMode = lensMode
+        _detectionCoordinator = StateObject(wrappedValue: DetectionCoordinator(lensMode: lensMode))
+    }
 
     var body: some View {
         ZStack {
-            // ✅ Replaces the placeholder with full CameraView
-            CameraView(onCapture: handleCapture, isCapturing: isCapturing)
-                .ignoresSafeArea()
-            
+            GeometryReader { proxy in
+                ZStack {
+                    ARCameraView(coordinator: detectionCoordinator)
+                        .ignoresSafeArea()
+                        .onAppear {
+                            viewSize = proxy.size
+                            detectionCoordinator.updateViewportSize(proxy.size)
+                            detectionCoordinator.setActive(true)
+                        }
+                        .onDisappear {
+                            detectionCoordinator.setActive(false)
+                        }
+
+                    DetectionOverlayView(overlays: detectionCoordinator.overlays)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                }
+                .onChange(of: proxy.size) { newSize in
+                    viewSize = newSize
+                    detectionCoordinator.updateViewportSize(newSize)
+                }
+            }
+
             VStack {
-                // 🔹 Top bar (Back button)
                 HStack {
                     Button(action: { dismiss() }) {
                         Text("‹ Back")
@@ -28,48 +49,35 @@ struct CameraScreen: View {
                             .cornerRadius(999)
                     }
                     Spacer()
+                    Text(lensMode.capitalized)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(Color.black.opacity(0.6))
+                        .cornerRadius(12)
                 }
                 .padding(.top, 24)
                 .padding(.horizontal, 16)
 
                 Spacer()
             }
-            
-            // 🔹 Status Banner
-            if let message = statusMessage {
+
+            if let banner = detectionCoordinator.statusBanner {
                 VStack {
                     HStack {
-                        Text(message)
+                        Text(banner.message)
                             .foregroundColor(.white)
                             .font(.system(size: 14))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(statusTone == .error
-                                ? Color.red.opacity(0.9)
-                                : Color.blue.opacity(0.85))
+                    .background(banner.tone == .error ? Color.red.opacity(0.9) : Color.blue.opacity(0.85))
                     .cornerRadius(12)
                     .padding(.horizontal, 16)
                     .padding(.top, 72)
                     Spacer()
-                }
-                .animation(.easeInOut, value: statusMessage)
-            }
-            
-            // 🔹 Loading overlay when analyzing frame
-            if isCapturing {
-                ZStack {
-                    Color.black.opacity(0.6).ignoresSafeArea()
-                    VStack {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Text("Analyzing frame...")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color(hex: "#f8fafc"))
-                            .padding(.top, 12)
-                    }
                 }
                 .transition(.opacity)
             }
@@ -77,41 +85,8 @@ struct CameraScreen: View {
         .background(Color.black)
         .navigationBarHidden(true)
     }
-
-    // MARK: - Logic
-    func handleCapture(imageData: Data) async {
-        isCapturing = true
-        statusTone = .info
-        statusMessage = "Analyzing frame..."
-        
-        do {
-            // Convert to Base64 just like in React Native
-            let base64String = imageData.base64EncodedString()
-            
-            // Call your Flask API
-            let result = try await APIService.shared.detectObjects(
-                base64String: base64String,
-                lensMode: lensMode
-            )
-            
-            if result.usingMock, let error = result.error {
-                statusTone = .error
-                statusMessage = APIService.shared.mapErrorToMessage(ApiError(info: error))
-
-            } else {
-                statusTone = .info
-                statusMessage = result.message ?? "Frame processed successfully by the backend."
-            }
-        } catch {
-            statusTone = .error
-            statusMessage = APIService.shared.mapErrorToMessage(error)
-        }
-        
-        isCapturing = false
-    }
 }
 
-// MARK: - Supporting Enum
 enum StatusTone {
     case info
     case error
