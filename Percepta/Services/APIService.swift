@@ -70,8 +70,8 @@ final class APIService {
     // MARK: - Configuration
     private let defaultPort = "5000"
     private let defaultPath = "/api"
-    private let defaultTimeout: TimeInterval = 10
-    private let maxRetries = 1
+    private let defaultTimeout: TimeInterval = 25
+    private let maxRetries = 0
 
     private var overrideBaseUrl: String? = "http://10.25.19.251:5050"
 
@@ -80,15 +80,23 @@ final class APIService {
     }
 
     private func baseCandidates() -> [String] {
-        var candidates: Set<String> = []
-        if let overrideBaseUrl {
-            candidates.insert(ensureApiPath(for: overrideBaseUrl))
-        }
-        candidates.insert(buildUrl(from: "127.0.0.1"))
-        candidates.insert(buildUrl(from: "localhost"))
-        candidates.insert(buildUrl(from: "10.0.2.2")) // Android emulator style
+        var candidates: [String] = []
+        var seen: Set<String> = []
 
-        return Array(candidates)
+        func append(_ value: String) {
+            guard !seen.contains(value) else { return }
+            candidates.append(value)
+            seen.insert(value)
+        }
+
+        if let overrideBaseUrl {
+            append(ensureApiPath(for: overrideBaseUrl))
+        }
+        append(buildUrl(from: "127.0.0.1"))
+        append(buildUrl(from: "localhost"))
+        append(buildUrl(from: "10.0.2.2")) // Android emulator style
+
+        return candidates
     }
 
     private func ensureApiPath(for base: String) -> String {

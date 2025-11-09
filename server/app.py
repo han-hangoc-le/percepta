@@ -307,7 +307,7 @@ def process_object_detection():
 @app.route("/generate", methods=["POST"])
 def generate():
     data = request.get_json(force=True)
-    object_name = data.get("object", "cup").lower()
+    object_name = data.get("object", "bottle").lower()
     lens_mode = data.get("lens_mode", "math").lower()  # 🔹 New field
 
     image_filename = f"{object_name}.png"
